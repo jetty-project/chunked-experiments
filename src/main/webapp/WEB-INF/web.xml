@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <display-name>Chunked Experiments</display-name>
+
+  <listener>
+    <listener-class>org.eclipse.jetty.demo.AppInit</listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>identity</servlet-name>
+    <servlet-class>org.eclipse.jetty.demo.IdentityServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>no-content-length</servlet-name>
+    <servlet-class>org.eclipse.jetty.demo.NoContentLengthServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>with-content-length</servlet-name>
+    <servlet-class>org.eclipse.jetty.demo.WithContentLengthServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>identity</servlet-name>
+    <url-pattern>/identity/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>no-content-length</servlet-name>
+    <url-pattern>/nolen/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>with-content-length</servlet-name>
+    <url-pattern>/withlen/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>
