@@ -16,7 +16,10 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.toolchain.test.IO;
@@ -40,7 +43,14 @@ public class ChunkingTest
     @BeforeClass
     public static void startServer() throws Exception
     {
-        server = new Server(9090);
+        server = new Server();
+        
+        HttpConfiguration httpConf = new HttpConfiguration();
+        httpConf.setOutputBufferSize(400);
+        HttpConnectionFactory http = new HttpConnectionFactory(httpConf);
+        ServerConnector connector = new ServerConnector(server, http);
+        connector.setPort(9090);
+        server.addConnector(connector);
 
         HandlerCollection handlers = new HandlerCollection();
         WebAppContext webapp = new WebAppContext();
@@ -240,6 +250,24 @@ public class ChunkingTest
         request.append("\r\n");
 
         assertIsNotChunked(request,serverURI.resolve("/nolen/twain.txt"));
+    }
+    
+    @Test
+    public void testHttp11_KeepAlive_NoContentLength() throws UnknownHostException, IOException
+    {
+        StringBuilder request = new StringBuilder();
+        request.append("GET /nolen/quotes.txt HTTP/1.1\r\n");
+        request.append("Host: localhost:9090\r\n");
+        request.append("Connection: keep-alive\r\n");
+        request.append("\r\n");
+
+        // second request (just to get the connection to close)
+        request.append("GET / HTTP/1.1\r\n");
+        request.append("Host: localhost:9090\r\n");
+        request.append("Connection: close\r\n");
+        request.append("\r\n");
+
+        assertIsNotChunked(request,serverURI.resolve("/nolen/quotes.txt"));
     }
 
     @Test
